@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emocionario Digital</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f7fa;
+      color: #333;
+    }
+    header {
+      background-color: #6c5ce7;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      font-size: 2rem;
+    }
+    main {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      padding: 1rem;
+    }
+    .card {
+      background-color: white;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.2s ease-in-out;
+    }
+    .card:hover {
+      transform: scale(1.03);
+    }
+    .card img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+    .card-title {
+      font-weight: bold;
+      font-size: 1.2rem;
+      padding: 0.5rem;
+    }
+    .modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      display: none;
+    }
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      max-width: 500px;
+      text-align: center;
+    }
+    .modal h2 {
+      margin-top: 0;
+    }
+    .close-btn {
+      background: #6c5ce7;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      margin-top: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>Emocionario Digital</header>
+  <main id="emocionario"></main>
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <h2 id="modalTitle"></h2>
+      <p id="modalText"></p>
+      <button class="close-btn" onclick="cerrarModal()">Cerrar</button>
+    </div>
+  </div>
+
+  <script>
+    const emociones = [
+      { letra: 'A', emocion: 'Alegría', definicion: 'Sentimiento de placer y satisfacción.', img: 'https://source.unsplash.com/featured/?joy' },
+      { letra: 'B', emocion: 'Bondad', definicion: 'Tendencia natural a hacer el bien.', img: 'https://source.unsplash.com/featured/?kindness' },
+      { letra: 'C', emocion: 'Confianza', definicion: 'Seguridad que se tiene en uno mismo o en alguien.', img: 'https://source.unsplash.com/featured/?trust' },
+      { letra: 'D', emocion: 'Desilusión', definicion: 'Pérdida de la esperanza o ilusión.', img: 'https://source.unsplash.com/featured/?disappointment' },
+      { letra: 'E', emocion: 'Empatía', definicion: 'Capacidad de ponerse en el lugar del otro.', img: 'https://source.unsplash.com/featured/?empathy' },
+      { letra: 'F', emocion: 'Felicidad', definicion: 'Estado de ánimo de satisfacción plena.', img: 'https://source.unsplash.com/featured/?happiness' },
+      { letra: 'G', emocion: 'Gratitud', definicion: 'Agradecimiento profundo hacia alguien o algo.', img: 'https://source.unsplash.com/featured/?gratitude' },
+      { letra: 'H', emocion: 'Hostilidad', definicion: 'Sentimiento de enemistad hacia alguien.', img: 'https://source.unsplash.com/featured/?hostility' },
+      { letra: 'I', emocion: 'Ilusión', definicion: 'Esperanza que impulsa a lograr algo.', img: 'https://source.unsplash.com/featured/?illusion' },
+      { letra: 'J', emocion: 'Júbilo', definicion: 'Alegría intensa y desbordante.', img: 'https://source.unsplash.com/featured/?jubilation' },
+      { letra: 'K', emocion: 'Kinestesia afectiva', definicion: 'Conciencia emocional a través del cuerpo.', img: 'https://source.unsplash.com/featured/?sensation' },
+      { letra: 'L', emocion: 'Lástima', definicion: 'Compasión hacia el sufrimiento ajeno.', img: 'https://source.unsplash.com/featured/?pity' },
+      { letra: 'M', emocion: 'Miedo', definicion: 'Emoción de alerta ante un peligro.', img: 'https://source.unsplash.com/featured/?fear' },
+      { letra: 'N', emocion: 'Nostalgia', definicion: 'Tristeza por la ausencia de algo querido.', img: 'https://source.unsplash.com/featured/?nostalgia' },
+      { letra: 'Ñ', emocion: 'Ñoñez', definicion: 'Sensación de ternura exagerada.', img: 'https://source.unsplash.com/featured/?cuteness' },
+      { letra: 'O', emocion: 'Orgullo', definicion: 'Satisfacción por logros o cualidades propias.', img: 'https://source.unsplash.com/featured/?pride' },
+      { letra: 'P', emocion: 'Paz', definicion: 'Estado de tranquilidad y armonía.', img: 'https://source.unsplash.com/featured/?peace' },
+      { letra: 'Q', emocion: 'Querencia', definicion: 'Sentimiento de afecto profundo por un lugar o persona.', img: 'https://source.unsplash.com/featured/?affection' },
+      { letra: 'R', emocion: 'Rabia', definicion: 'Ira intensa por algo injusto.', img: 'https://source.unsplash.com/featured/?anger' },
+      { letra: 'S', emocion: 'Sorpresa', definicion: 'Reacción inesperada ante algo imprevisto.', img: 'https://source.unsplash.com/featured/?surprise' },
+      { letra: 'T', emocion: 'Tristeza', definicion: 'Sentimiento de pena o dolor emocional.', img: 'https://source.unsplash.com/featured/?sadness' },
+      { letra: 'U', emocion: 'Urgencia emocional', definicion: 'Impulso de actuar por necesidad emocional.', img: 'https://source.unsplash.com/featured/?urgency' },
+      { letra: 'V', emocion: 'Vergüenza', definicion: 'Incomodidad por un acto propio o ajeno.', img: 'https://source.unsplash.com/featured/?shame' },
+      { letra: 'W', emocion: 'Wonder (asombro)', definicion: 'Admiración intensa ante lo extraordinario.', img: 'https://source.unsplash.com/featured/?wonder' },
+      { letra: 'X', emocion: 'Xenofilia', definicion: 'Aprecio por lo extranjero o diferente.', img: 'https://source.unsplash.com/featured/?diversity' },
+      { letra: 'Y', emocion: 'Yin emocional', definicion: 'Lado introspectivo, suave y receptivo del sentir.', img: 'https://source.unsplash.com/featured/?calm' },
+      { letra: 'Z', emocion: 'Zozobra', definicion: 'Inquietud ante un peligro inminente.', img: 'https://source.unsplash.com/featured/?anxiety' }
+    ];
+
+    const contenedor = document.getElementById('emocionario');
+    emociones.forEach(({ emocion, definicion, img }) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <img src="${img}" alt="${emocion}">
+        <div class="card-title">${emocion}</div>
+      `;
+      card.onclick = () => abrirModal(emocion, definicion);
+      contenedor.appendChild(card);
+    });
+
+    function abrirModal(titulo, texto) {
+      document.getElementById('modalTitle').textContent = titulo;
+      document.getElementById('modalText').textContent = texto;
+      document.getElementById('modal').style.display = 'flex';
+    }
+
+    function cerrarModal() {
+      document.getElementById('modal').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
